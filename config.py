@@ -1,0 +1,3 @@
+TOKEN = ''
+
+CRYPTO_TOKEN = ''
