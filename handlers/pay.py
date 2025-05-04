@@ -25,7 +25,7 @@ async def get_pay_link(amount):
         response = requests.post('https://pay.crypt.bot/api/createInvoice', headers=headers, json=data)
         if response.ok:
             response_data = response.json()
-            return response_data['result']['pay_url'], response_data['result']['invoice_id'], amount  # Возвращаем сумму
+            return response_data['result']['pay_url'], response_data['result']['invoice_id'], amount
         else:
             print(f"Ошибка при создании инвойса: {response.status_code}, {response.text}")
             return None, None, None
@@ -136,7 +136,6 @@ async def process_custom_amount(message: types.Message, state: FSMContext):
                     parse_mode='HTML'
                 )
             else:
-                # fallback: если нет ID сообщения, просто отправим новое
                 sent = await message.answer(f'Ссылка для оплаты <b>{amount} USDT</b>:', reply_markup=kb, parse_mode='HTML')
                 await state.update_data(bot_message_id=sent.message_id)
         else:
@@ -189,10 +188,9 @@ async def check_payment(callback: CallbackQuery):
             if invoice:
                 status = invoice['status']
                 if status == 'paid':
-                    # Оплата успешно получена, добавляем деньги на баланс пользователя
-                    amount = invoices.get(chat_id, {}).get('amount', 0)  # Используем сохраненную сумму
+                    amount = invoices.get(chat_id, {}).get('amount', 0)
                     if amount:
-                        success = await update_user_balance(chat_id, amount)  # Добавляем на баланс
+                        success = await update_user_balance(chat_id, amount)
                         if success:
                             await callback.message.edit_text(
                                 text=f'Оплата успешно получена! Баланс обновлен на <b>{amount} USDT</b>.',
